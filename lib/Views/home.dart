@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_flutter_app/Views/article_news.dart';
 import 'package:news_flutter_app/Views/category_news.dart';
+import 'package:news_flutter_app/Views/details.dart';
 import 'package:news_flutter_app/helper/category_data.dart';
 import 'package:news_flutter_app/helper/news_data.dart';
 import 'package:news_flutter_app/models/article_model.dart';
@@ -39,18 +40,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF464646),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black,
         elevation: 0.0,
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const [
-            Text("Flutter", style: TextStyle(color: Colors.black)),
             Text(
-              "News",
-              style: TextStyle(color: Colors.blue),
-            )
+              "HEADLINES",
+              style: TextStyle(
+                  letterSpacing: 1.5,
+                  fontSize: 29,
+                  color: Colors.white,
+                  fontFamily: 'Roboto'),
+            ),
           ],
         ),
       ),
@@ -63,43 +68,19 @@ class _HomePageState extends State<HomePage> {
           : SingleChildScrollView(
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  children: [
-                    // categories
-                    Container(
-                      height: 70,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          return CategoryTile(
-                              categoryName:
-                                  categories[index].categorieName.toString(),
-                              imageUrl:
-                                  categories[index].imageAssetUrl.toString());
-                        },
-                      ),
-                    ),
-
-                    // blogs
-
-                    Container(
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: articles.length,
-                          physics: ClampingScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return BlogTile(
-                              imageUrl: articles[index].urlToImage.toString(),
-                              title: articles[index].title.toString(),
-                              desc: articles[index].description.toString(),
-                              url: articles[index].url.toString(),
-                            );
-                          }),
-                    )
-                  ],
-                ),
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: articles.length,
+                    physics: ClampingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return BlogTile(
+                        imageUrl: articles[index].urlToImage.toString(),
+                        title: articles[index].title.toString(),
+                        desc: articles[index].description.toString(),
+                        publish: articles[index].publishedAt.toString(),
+                        url: articles[index].url.toString(),
+                      );
+                    }),
               ),
             ),
     );
@@ -158,11 +139,12 @@ class CategoryTile extends StatelessWidget {
 }
 
 class BlogTile extends StatelessWidget {
-  String imageUrl, title, desc, url;
+  String imageUrl, title, desc, publish, url;
   BlogTile(
       {required this.imageUrl,
       required this.title,
       required this.desc,
+      required this.publish,
       required this.url});
 
   @override
@@ -171,29 +153,73 @@ class BlogTile extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ArticlePage(blogUrl: url)),
+          MaterialPageRoute(
+              builder: (context) => DetailsScreen(
+                    publish: publish,
+                    desc: desc,
+                    title: title,
+                    img: imageUrl,
+                  )),
         );
       },
       child: Container(
-        padding: EdgeInsets.only(top: 10),
-        child: Column(
+        padding: const EdgeInsets.only(top: 20),
+        child: Stack(
           children: [
-            ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.network(imageUrl)),
-            SizedBox(
+            Opacity(
+              opacity: 0.6,
+              child: Container(
+                height: 250,
+                decoration: BoxDecoration(
+                    // gradient: LinearGradient(
+                    //   colors: [
+                    //     Colors.black.withOpacity(0.8),
+                    //     Colors.black.withOpacity(0.4),
+                    //   ],
+                    //   begin: Alignment.topCenter,
+                    //   end: Alignment.bottomCenter,
+                    // ),
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(8),
+                    image: DecorationImage(
+                        image: NetworkImage(imageUrl), fit: BoxFit.fill)),
+                // child: Image.network(
+                //   imageUrl,
+                //   fit: BoxFit.fill,
+                // ),
+              ),
+            ),
+            const SizedBox(
               height: 8,
             ),
-            Text(
-              title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-            ),
-            SizedBox(
-              height: 8,
-            ),
-            Text(
-              desc,
-              style: TextStyle(color: Colors.grey),
+            Positioned(
+              bottom: 10.0,
+              left: 16,
+              right: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    overflow: TextOverflow.clip,
+                    maxLines: 2,
+                    style: const TextStyle(
+                        fontSize: 22,
+                        color: Color(0xFFf2f2f2),
+                        fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    publish,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

@@ -22,6 +22,7 @@ class News {
             url: element['url'],
             urlToImage: element['urlToImage'],
             content: element['content'],
+            publishedAt: element['publishedAt'],
             description: element['description'],
           );
 
@@ -51,6 +52,7 @@ class CategoryNewsClass {
             url: element['url'],
             urlToImage: element['urlToImage'],
             content: element['content'],
+            publishedAt: element['publishedAt'],
             description: element['description'],
           );
 
